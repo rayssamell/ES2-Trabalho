@@ -39,11 +39,11 @@ public class ProdutoDAO {
     }
 
     // DELETE
-    public void excluir(Produto produto) {
+    public void excluir(Long produtoId) {
         Session session = HibernateUtil.getFactory().openSession();
         Transaction tx = session.beginTransaction();
 
-        session.remove(produto);
+        session.remove(produtoId);
 
         tx.commit();
         session.close();

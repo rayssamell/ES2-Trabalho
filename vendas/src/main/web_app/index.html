@@ -48,7 +48,7 @@
 
     function carregarProdutos() {
         const tabela = document.getElementById('corpoTabela');
-        tabela.innerHTML = '<tr><td colspan="5" class="text-center">Carregando dados do SGBD...</td></tr>';
+        tabela.innerHTML = '<tr><td colspan="6" class="text-center">Carregando dados do SGBD...</td></tr>';
 
         fetch('http://localhost:8080/listarProdutos')
             .then(res => res.json())

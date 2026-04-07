@@ -7,7 +7,7 @@
 /home/rayssamels/Documentos/ES2-Trabalho/vendas/src/main/java/com/trabalho_es2/model/Produto.java
 /home/rayssamels/Documentos/ES2-Trabalho/vendas/src/main/java/com/trabalho_es2/model/ProdutoEletronico.java
 /home/rayssamels/Documentos/ES2-Trabalho/vendas/src/main/java/com/trabalho_es2/model/ProdutoPerecivel.java
-/home/rayssamels/Documentos/ES2-Trabalho/vendas/src/main/java/com/trabalho_es2/service/ExcluirProduto.java
+/home/rayssamels/Documentos/ES2-Trabalho/vendas/src/main/java/com/trabalho_es2/service/ExcluirProdutoService.java
 /home/rayssamels/Documentos/ES2-Trabalho/vendas/src/main/java/com/trabalho_es2/service/ListarProdutosService.java
 /home/rayssamels/Documentos/ES2-Trabalho/vendas/src/main/java/com/trabalho_es2/service/ProdutoService.java
 /home/rayssamels/Documentos/ES2-Trabalho/vendas/src/main/java/com/trabalho_es2/util/HibernateUtil.java

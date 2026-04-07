@@ -19,11 +19,11 @@ public class ItemDAO {
     }
 
     // DELETE
-    public void remover(Item item) {
+    public void remover(Long itemId) {
         Session session = HibernateUtil.getFactory().openSession();
         Transaction tx = session.beginTransaction();
 
-        session.remove(item);
+        session.remove(itemId);
 
         tx.commit();
         session.close();

@@ -14,14 +14,13 @@ import java.util.List;
 @WebServlet("/listarProdutos")
 public class ListarProdutosService extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        // ESSENCIAL: Libera o acesso para o Live Server do VS Code
         response.addHeader("Access-Control-Allow-Origin", "*");
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
 
         try {
             ProdutoDAO dao = new ProdutoDAO();
-            List<Produto> lista = dao.consultar(); // Certifique-se que o DAO não retorna null
+            List<Produto> lista = dao.consultar(); 
 
             Gson gson = new Gson();
             String json = gson.toJson(lista);
@@ -29,7 +28,7 @@ public class ListarProdutosService extends HttpServlet {
         } catch (Exception e) {
             response.setStatus(500);
             response.getWriter().write("{\"erro\": \"" + e.getMessage() + "\"}");
-            e.printStackTrace(); // Olhe o console do Eclipse/IntelliJ para ver o erro real
+            e.printStackTrace();
         }
     }
 }

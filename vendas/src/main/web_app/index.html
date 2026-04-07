@@ -20,7 +20,7 @@
 <div class="container">
     <div class="card shadow">
         <div class="card-header bg-white d-flex justify-content-between align-items-center">
-            <h4 class="mb-0">Produtos Cadastrados no MySQL</h4>
+            <h4 class="mb-0">Produtos Cadastrados</h4>
             <button class="btn btn-sm btn-primary" onclick="carregarProdutos()">Atualizar Lista</button>
         </div>
         <div class="card-body">
@@ -32,8 +32,9 @@
                         <th>Preço</th>
                         <th>Estoque</th>
                         <th>Detalhes (Herança)</th>
+                        <th>Ações</th>
                     </tr>
-                </thead>
+                    </thead>
                 <tbody id="corpoTabela">
                     </tbody>
             </table>
@@ -65,14 +66,40 @@
                             <td>R$ ${p.preco.toFixed(2)}</td>
                             <td>${p.estoque} un.</td>
                             <td><span class="badge bg-info text-dark">${detalhe}</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-danger"
+                                    onclick="excluirProduto(${p.id})">
+                                    Excluir
+                                </button>
+                            </td>
                         </tr>
-                    `;
+                        `;
                 });
             })
             .catch(err => {
                 tabela.innerHTML = '<tr><td colspan="5" class="text-danger">Erro ao conectar com o Servidor Java.</td></tr>';
             });
     }
+    function excluirProduto(id) {
+
+        if (!confirm("Deseja realmente excluir este produto?"))
+            return;
+
+        fetch(`http://localhost:8080/excluirProduto/${id}`, {
+            method: 'DELETE'
+        })
+        .then(res => {
+            if (res.ok) {
+                alert("Produto excluído!");
+                carregarProdutos(); // atualiza tabela
+            } else {
+                alert("Erro ao excluir.");
+            }
+        })
+        .catch(() => {
+            alert("Erro ao conectar com servidor.");
+        });
+}
 </script>
 </body>
 </html>

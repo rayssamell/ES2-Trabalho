@@ -1,153 +1,203 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tela Pedido - ES2</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        body { background-color: #f8f9fa; }
-        .carrinho-area { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        pre { background-color: #2b2b2b; color: #a9b7c6; padding: 15px; border-radius: 5px; height: 300px; overflow-y: auto; }
+        body {
+            background-color: #f8f9fa;
+        }
+
+        .carrinho-area {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        pre {
+            background-color: #2b2b2b;
+            color: #a9b7c6;
+            padding: 15px;
+            border-radius: 5px;
+            height: 300px;
+            overflow-y: auto;
+        }
     </style>
 </head>
+
 <body>
 
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
-    <div class="container">
-        <a class="navbar-brand" href="index.html">Sistema Vendas</a>
-        <div class="navbar-nav">
-            <a class="nav-link" href="produto.html">Novo Produto</a>
-            <a class="nav-link" href="pedido.html">Novo Pedido</a>
-        </div>
-    </div>
-</nav>
-
-<div class="container">
-    <div class="row">
-        <div class="col-md-12">
-             <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">Montar Pedido</h5>
-                </div>
-            <div class="carrinho-area">
-               
-                <form id="formAdicionarItem" class="mt-3">
-                    <div class="mb-3">
-                        <label class="form-label">Produto</label>
-                        <select class="form-select" id="selectProduto" required></select>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Quantidade (Qtde)</label>
-                            <input type="number" class="form-control" id="inputQtde" value="1" min="1" required>
-                        </div>
-                        <div class="col-md-6 d-flex align-items-end mb-3">
-                            <button type="submit" class="btn btn-outline-primary w-100">+ Adicionar Item</button>
-                        </div>
-                    </div>
-                </form>
-
-                <table class="table table-sm mt-4">
-                    <thead class="table-light">
-                        <tr>
-                            <th>Produto</th>
-                            <th>Qtde</th>
-                            <th>Valor Unit.</th>
-                            <th>Subtotal</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tabelaItens">
-                        </tbody>
-                    <tfoot>
-                        <tr class="fw-bold table-secondary">
-                            <td colspan="3" class="text-end">VALOR TOTAL:</td>
-                            <td id="valorTotalPedido">R$ 0,00</td>
-                        </tr>
-                    </tfoot>
-                </table>
-
-                <button id="btnFinalizarPedido" class="btn btn-success w-100 mt-3" disabled>
-                    Finalizar Pedido
-                </button>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">Sistema Vendas</a>
+            <div class="navbar-nav">
+                <a class="nav-link" href="produto.html">Novo Produto</a>
+                <a class="nav-link" href="pedido.html">Novo Pedido</a>
             </div>
         </div>
+    </nav>
 
-        
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">Montar Pedido</h5>
+                    </div>
+                    <div class="carrinho-area">
+
+                        <form id="formAdicionarItem" class="mt-3">
+                            <div class="mb-3">
+                                <label class="form-label">Produto</label>
+                                <select class="form-select" id="selectProduto" required></select>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Quantidade (Qtde)</label>
+                                    <input type="number" class="form-control" id="inputQtde" value="1" min="1" required>
+                                </div>
+                                <div class="col-md-6 d-flex align-items-end mb-3">
+                                    <button type="submit" class="btn btn-outline-primary w-100">+ Adicionar
+                                        Item</button>
+                                </div>
+                            </div>
+                        </form>
+
+                        <table class="table table-sm mt-4">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Produto</th>
+                                    <th>Qtde</th>
+                                    <th>Valor Unit.</th>
+                                    <th>Subtotal</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabelaItens">
+                            </tbody>
+                            <tfoot>
+                                <tr class="fw-bold table-secondary">
+                                    <td colspan="3" class="text-end">VALOR TOTAL:</td>
+                                    <td id="valorTotalPedido">R$ 0,00</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+
+                        <button id="btnFinalizarPedido" class="btn btn-success w-100 mt-3" disabled>
+                            Finalizar Pedido
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
     </div>
-</div>
 
-<script>
-    let carrinho = [];
-    let produtosDisponiveis = JSON.parse(localStorage.getItem('banco_produtos')) || [];
-    
-    // Popular o Select com produtos do "banco"
-    const select = document.getElementById('selectProduto');
-    produtosDisponiveis.forEach(p => {
-        select.innerHTML += `<option value="${p.id}">${p.nome} (R$ ${p.preco.toFixed(2)})</option>`;
-    });
+    <script>
+        let carrinho = [];
+        let produtosDisponiveis = [];
 
-    // Ação de Adicionar Item (Cria o objeto Item do Diagrama)
-    document.getElementById('formAdicionarItem').addEventListener('submit', function(e) {
-        e.preventDefault();
-        const prodId = parseInt(document.getElementById('selectProduto').value);
-        const produto = produtosDisponiveis.find(p => p.id === prodId);
-        const qtde = parseInt(document.getElementById('inputQtde').value);
+        // CARREGA PRODUTOS DO BACKEND
+        function carregarProdutos() {
+            fetch('http://localhost:8080/listarProdutos')
+                .then(res => res.json())
+                .then(produtos => {
 
-        const novoItem = {
-            Codigoitem: Date.now(), // PK do Item no diagrama
-            Qtde: qtde,
-            ValorItem: produto.preco,
-            produto: produto // FK para o Produto
-        };
+                    produtosDisponiveis = produtos;
 
-        carrinho.push(novoItem);
-        atualizarTabela();
-        document.getElementById('btnFinalizarPedido').disabled = false;
-    });
+                    const select = document.getElementById('selectProduto');
+                    select.innerHTML = '';
 
-    function atualizarTabela() {
-        const tbody = document.getElementById('tabelaItens');
-        tbody.innerHTML = '';
-        let total = 0;
+                    produtos.forEach(p => {
+                        select.innerHTML += `
+                    <option value="${p.id}">
+                        ${p.nome} (R$ ${p.preco.toFixed(2)})
+                    </option>
+                `;
+                    });
+                })
+                .catch(() => alert("Erro ao carregar produtos"));
+        }
 
-        carrinho.forEach(item => {
-            const subtotal = item.Qtde * item.ValorItem;
-            total += subtotal;
-            tbody.innerHTML += `
-                <tr>
-                    <td>${item.produto.nome}</td>
-                    <td>${item.Qtde}</td>
-                    <td>R$ ${item.ValorItem.toFixed(2)}</td>
-                    <td>R$ ${subtotal.toFixed(2)}</td>
-                </tr>`;
+        // RODA AO ABRIR A PÁGINA
+        window.onload = carregarProdutos;
+
+        // ADICIONAR ITEM
+        document.getElementById('formAdicionarItem').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const prodId = parseInt(document.getElementById('selectProduto').value);
+            const produto = produtosDisponiveis.find(p => p.id === prodId);
+            const qtde = parseInt(document.getElementById('inputQtde').value);
+
+            const novoItem = {
+                quantidade: qtde,
+                valorItem: produto.preco,
+                produto: {
+                    id: produto.id,
+                    nome: produto.nome
+                }
+            };
+
+            carrinho.push(novoItem);
+            atualizarTabela();
+            document.getElementById('btnFinalizarPedido').disabled = false;
         });
 
-        document.getElementById('valorTotalPedido').innerText = `R$ ${total.toFixed(2)}`;
-    }
+        //  ATUALIZA TABELA
+        function atualizarTabela() {
+            const tbody = document.getElementById('tabelaItens');
+            tbody.innerHTML = '';
+            let total = 0;
 
-    // Finalizar Pedido (Cria o objeto Pedido do Diagrama)
-    document.getElementById('btnFinalizarPedido').addEventListener('click', function() {
-        const total = carrinho.reduce((acc, item) => acc + (item.Qtde * item.ValorItem), 0);
-        
-        const pedidoFinal = {
-            id: Date.now(), // PK do Pedido
-            data: new Date().toISOString().split('T')[0],
-            ValorTotal: total,
-            itens: carrinho // Lista de objetos Item
-        };
+            carrinho.forEach(item => {
+                const subtotal = item.quantidade * item.valorItem;
+                total += subtotal;
 
-        // Mostra o JSON na tela
-        document.getElementById('jsonOutput').innerText = JSON.stringify(pedidoFinal, null, 2);
+                tbody.innerHTML += `
+                <tr>
+                    <td>${item.produto.nome}</td>
+                    <td>${item.quantidade}</td>
+                    <td>R$ ${item.valorItem.toFixed(2)}</td>
+                    <td>R$ ${subtotal.toFixed(2)}</td>
+                </tr>`;
+            });
 
-        // ENVIO PARA O JAVA (PRODUTO SERVICE)
-        fetch('http://localhost:8080/cadastrarPedido', {
-            method: 'POST',
-            body: JSON.stringify(pedidoFinal)
-        })
-        .then(res => res.text())
-        .then(msg => alert("Pedido e Itens salvos no MySQL!"));
-    });
-</script>
+            document.getElementById('valorTotalPedido').innerText = `R$ ${total.toFixed(2)}`;
+        }
+
+        //  FINALIZAR PEDIDO
+        document.getElementById('btnFinalizarPedido').addEventListener('click', function () {
+
+            const total = carrinho.reduce((acc, item) =>
+                acc + (item.quantidade * item.valorItem), 0);
+
+            const pedidoFinal = {
+                data: new Date().toISOString().split('T')[0],
+                valorTotal: total,
+                itens: carrinho
+            };
+
+            fetch('http://localhost:8080/cadastrarPedido', {
+                method: 'POST',
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(pedidoFinal)
+            })
+                .then(res => res.json())
+                .then(() => {
+                    alert("Pedido salvo!");
+                    carrinho = [];
+                    atualizarTabela();
+                })
+                .catch(() => alert("Erro ao salvar pedido"));
+        });
+    </script>
 
 </body>
+
 </html>

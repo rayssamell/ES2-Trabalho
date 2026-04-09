@@ -107,23 +107,29 @@
         
         const tipoSelecionado = document.querySelector('input[name="tipoProd"]:checked').value;
 
-        const dadosParaEnviar = {
-            tipo: tipoSelecionado, // Isso é essencial para o Service saber qual classe usar
+        let dadosParaEnviar = {
+            tipo: tipoSelecionado,
             nome: document.getElementById('prodNome').value,
             preco: parseFloat(document.getElementById('prodPreco').value),
             estoque: parseInt(document.getElementById('prodEstoque').value),
-            // Envia os campos específicos (o Gson ignora o que for null no Java)
-            voltagem: document.getElementById('prodVoltagem')?.value,
-            data_validade: document.getElementById('prodValidade')?.value
+            voltagem: document.getElementById('prodVoltagem')?.value
         };
+
+        if (tipoSelecionado === "PERECIVEL") {
+            dadosParaEnviar.dataValidade = document.getElementById('prodValidade').value;
+        }
 
         fetch('http://localhost:8080/cadastrarProduto', {
             method: 'POST',
-            body: JSON.stringify(dadosParaEnviar)
-        })
-        .then(res => res.json())
-        .then(data => alert(data.mensagem))
-    });
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(dadosParaEnviar)
+            })
+            .then(res => res.json())
+            .then(data => alert(data.mensagem))
+            .catch(() => alert("Erro ao cadastrar"));
+        });
 </script>
 
 </body>

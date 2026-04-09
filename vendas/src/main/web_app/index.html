@@ -1,105 +1,187 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <title>Painel de Controle - SGBD</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
+
 <body class="bg-light">
 
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">Sistema Vendas</a>
+            <div class="navbar-nav">
+                <a class="nav-link" href="produto.html">Novo Produto</a>
+                <a class="nav-link" href="pedido.html">Novo Pedido</a>
+            </div>
+        </div>
+    </nav>
+
     <div class="container">
-        <a class="navbar-brand" href="index.html">Sistema Vendas</a>
-        <div class="navbar-nav">
-            <a class="nav-link" href="produto.html">Novo Produto</a>
-            <a class="nav-link" href="pedido.html">Novo Pedido</a>
-        </div>
-    </div>
-</nav>
+        <div class="card shadow">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <h4 class="mb-0">Produtos Cadastrados</h4>
+                <button class="btn btn-sm btn-primary" onclick="carregarProdutos()">Atualizar Lista</button>
+            </div>
 
-<div class="container">
-    <div class="card shadow">
-        <div class="card-header bg-white d-flex justify-content-between align-items-center">
-            <h4 class="mb-0">Produtos Cadastrados</h4>
-            <button class="btn btn-sm btn-primary" onclick="carregarProdutos()">Atualizar Lista</button>
-        </div>
-        <div class="card-body">
-            <table class="table table-hover">
-                <thead class="table-dark">
-                    <tr>
-                        <th>ID</th>
-                        <th>Nome</th>
-                        <th>Preço</th>
-                        <th>Estoque</th>
-                        <th>Detalhes (Herança)</th>
-                        <th>Ações</th>
-                    </tr>
-                    </thead>
-                <tbody id="corpoTabela">
-                    </tbody>
-            </table>
-        </div>
-    </div>
-</div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label">Filtrar por tipo:</label>
+                    <select class="form-select" onchange="filtrarProdutos(this.value)">
+                        <option value="TODOS">Todos</option>
+                        <option value="ELETRONICO">Eletrônicos</option>
+                        <option value="PERECIVEL">Perecíveis</option>
+                    </select>
+                </div>
 
-<script>
-    // Executa ao carregar a página
-    window.onload = carregarProdutos;
-
-    function carregarProdutos() {
-        const tabela = document.getElementById('corpoTabela');
-        tabela.innerHTML = '<tr><td colspan="6" class="text-center">Carregando dados do SGBD...</td></tr>';
-
-        fetch('http://localhost:8080/listarProdutos')
-            .then(res => res.json())
-            .then(produtos => {
-                tabela.innerHTML = ''; // Limpa o carregando
-                
-                produtos.forEach(p => {
-                    // Lógica para exibir atributo da classe filha (Voltagem ou Validade)
-                    let detalhe = p.voltagem ? `Voltagem: ${p.voltagem}` : `Validade: ${p.data_validade}`;
-                    
-                    tabela.innerHTML += `
+                <table class="table table-hover">
+                    <thead class="table-dark">
                         <tr>
-                            <td>${p.id}</td>
-                            <td>${p.nome}</td>
-                            <td>R$ ${p.preco.toFixed(2)}</td>
-                            <td>${p.estoque} un.</td>
-                            <td><span class="badge bg-info text-dark">${detalhe}</span></td>
-                            <td>
-                                <button class="btn btn-sm btn-danger"
-                                    onclick="excluirProduto(${p.id})">
-                                    Excluir
-                                </button>
-                            </td>
+                            <th>ID</th>
+                            <th>Nome</th>
+                            <th>Preço</th>
+                            <th>Estoque</th>
+                            <th>Detalhes (Herança)</th>
+                            <th>Ações</th>
                         </tr>
-                        `;
+                    </thead>
+                    <tbody id="corpoTabela">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card shadow mt-4">
+            <div class="card-header bg-white d-flex justify-content-between">
+                <h4>Pedidos</h4>
+                <button class="btn btn-sm btn-primary" onclick="carregarPedidos()">Atualizar</button>
+            </div>
+
+            <div class="card-body">
+                <table class="table table-bordered">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>ID</th>
+                            <th>Data</th>
+                            <th>Total</th>
+                            <th>Itens</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabelaPedidos"></tbody>
+                </table>
+            </div>
+        </div>
+        
+    </div>
+
+    <script>
+        // Executa ao carregar a página
+        window.onload = carregarProdutos;
+        window.onload = carregarPedidos;
+
+        let listaOriginal = [];
+
+        function carregarProdutos() {
+            const tabela = document.getElementById('corpoTabela');
+
+            fetch('http://localhost:8080/listarProdutos')
+                .then(res => res.json())
+                .then(produtos => {
+                    listaOriginal = produtos;
+                    renderizarProdutos(produtos);
                 });
-            })
-            .catch(err => {
-                tabela.innerHTML = '<tr><td colspan="5" class="text-danger">Erro ao conectar com o Servidor Java.</td></tr>';
+        }
+
+        function renderizarProdutos(produtos) {
+            const tabela = document.getElementById('corpoTabela');
+            tabela.innerHTML = '';
+
+            produtos.forEach(p => {
+
+                let detalhe = p.voltagem
+                    ? `Voltagem: ${p.voltagem}`
+                    : `Validade: ${p.dataValidade}`;
+
+                tabela.innerHTML += `
+                <tr>
+                    <td>${p.id}</td>
+                    <td>${p.nome}</td>
+                    <td>R$ ${p.preco.toFixed(2)}</td>
+                    <td>${p.estoque}</td>
+                    <td><span class="badge bg-info">${detalhe}</span></td>
+                    <td>
+                        <button class="btn btn-danger btn-sm"
+                            onclick="excluirProduto(${p.id})">
+                            Excluir
+                        </button>
+                    </td>
+                </tr>
+            `;
             });
-    }
-    function excluirProduto(id) {
+        }
 
-        if (!confirm("Deseja realmente excluir este produto?"))
-            return;
-
-        fetch(`http://localhost:8080/excluirProduto/${id}`, {
-            method: 'DELETE'
-        })
-        .then(res => {
-            if (res.ok) {
-                alert("Produto excluído!");
-                carregarProdutos(); // atualiza tabela
-            } else {
-                alert("Erro ao excluir.");
+        function filtrarProdutos(tipo) {
+            if (tipo === "TODOS") {
+                renderizarProdutos(listaOriginal);
+                return;
             }
-        })
-        .catch(() => {
-            alert("Erro ao conectar com servidor.");
-        });
-}
-</script>
+
+            const filtrados = listaOriginal.filter(p => {
+                if (tipo === "ELETRONICO") return p.voltagem != null;
+                if (tipo === "PERECIVEL") return p.dataValidade != null;
+            });
+
+            renderizarProdutos(filtrados);
+        }
+
+        function excluirProduto(id) {
+
+            if (!confirm("Deseja realmente excluir este produto?"))
+                return;
+
+            fetch(`http://localhost:8080/excluirProduto/${id}`, {
+                method: 'DELETE'
+            })
+                .then(res => {
+                    if (res.ok) {
+                        alert("Produto excluído!");
+                        carregarProdutos(); // atualiza tabela
+                    } else {
+                        alert("Erro ao excluir.");
+                    }
+                })
+                .catch(() => {
+                    alert("Erro ao conectar com servidor.");
+                });
+        }
+
+        function carregarPedidos() {
+            fetch('http://localhost:8080/listarPedidos')
+                .then(res => res.json())
+                .then(pedidos => {
+                    const tabela = document.getElementById('tabelaPedidos');
+                    tabela.innerHTML = '';
+
+                    pedidos.forEach(p => {
+
+                        let itensTexto = p.itens.map(i =>
+                            `${i.produto.nome} (${i.qtde})`
+                        ).join("<br>");
+
+                        tabela.innerHTML += `
+                            <tr>
+                                <td>${p.id}</td>
+                                <td>${p.data}</td>
+                                <td>R$ ${p.valorTotal.toFixed(2)}</td>
+                                <td>${itensTexto}</td>
+                            </tr>
+                        `;
+                    });
+                });
+        }
+    </script>
 </body>
+
 </html>

@@ -2,6 +2,9 @@ package com.trabalho_es2.dao;
 
 import com.trabalho_es2.model.Pedido;
 import com.trabalho_es2.util.HibernateUtil;
+
+import java.util.List;
+
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
@@ -18,10 +21,12 @@ public class PedidoDAO {
     }
 
     // READ
-    public Pedido consultar(Long id) {
-        Session session = HibernateUtil.getFactory().openSession();
-        Pedido p = session.get(Pedido.class, id);
-        session.close();
-        return p;
+    public List<Pedido> consultar() {
+        try (Session session = HibernateUtil.getFactory().openSession()) {
+            return session.createQuery(
+                "select distinct p from Pedido p left join fetch p.itens i left join fetch i.produto",
+                Pedido.class
+            ).list();
+        }
     }
 }

@@ -20,6 +20,16 @@
 
         <property name="hibernate.hbm2ddl.auto">update</property>
 
+        <property name="jakarta.persistence.schema-generation.scripts.action">create</property>
+
+        <property name="jakarta.persistence.schema-generation.scripts.create-target">
+            schema.sql
+        </property>
+
+        <property name="jakarta.persistence.schema-generation.create-source">
+            metadata
+        </property>
+
         <mapping class="com.trabalho_es2.model.Produto"/>
         <mapping class="com.trabalho_es2.model.ProdutoEletronico"/>
         <mapping class="com.trabalho_es2.model.ProdutoPerecivel"/>

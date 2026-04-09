@@ -40,13 +40,37 @@ public class ProdutoDAO {
 
     // DELETE
     public void excluir(Long produtoId) {
+
         Session session = HibernateUtil.getFactory().openSession();
-        Transaction tx = session.beginTransaction();
+        Transaction tx = null;
 
-        session.remove(produtoId);
+        try {
+            tx = session.beginTransaction();
 
-        tx.commit();
-        session.close();
+            session.createMutationQuery("delete from Item where produto.id = :id")
+                .setParameter("id", produtoId)
+                .executeUpdate();
+
+            Produto produto = session.get(Produto.class, produtoId);
+
+            if (produto != null) {
+                session.remove(produto);
+            }
+
+            tx.commit();
+
+        } catch (Exception e) {
+            if (tx != null) tx.rollback();
+            throw e;
+        } finally {
+            session.close();
+        }
     }
 
+    //Para Visualização
+    public Produto buscarPorID(Long id) {
+        try (Session session = HibernateUtil.getFactory().openSession()) {
+            return session.get(Produto.class, id);
+        }
+    }
 }
